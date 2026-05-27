@@ -300,6 +300,7 @@ async function handleEpub(file) {
     document.getElementById('resetBtn').classList.add('visible');
     uploadArea.querySelector('.hint').innerHTML = `已加载: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB · EPUB)`;
     renderResult();
+    saveToLocal();
     showToast(`EPUB 解析完成，共 ${chapters.length} 章`);
 
   } catch (err) {
@@ -423,6 +424,7 @@ async function handleMobi(file) {
     document.getElementById('resetBtn').classList.add('visible');
     uploadArea.querySelector('.hint').innerHTML = `已加载: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB · MOBI)`;
     renderResult();
+    saveToLocal();
     showToast(`MOBI 解析完成，共 ${chapters.length} 章`);
 
   } catch (err) {
@@ -521,6 +523,30 @@ function splitDocument() {
 
   chapters = chapters.filter(c => c.body.length > 0);
   renderResult();
+  saveToLocal();
+}
+
+function saveToLocal() {
+  try {
+    const data = { chapters, fileName: uploadArea.querySelector('.hint')?.innerHTML || '' };
+    localStorage.setItem('doc-splitter-data', JSON.stringify(data));
+  } catch (e) { /* ignore quota errors */ }
+}
+
+function restoreFromLocal() {
+  try {
+    const saved = localStorage.getItem('doc-splitter-data');
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    if (data.chapters && data.chapters.length > 0) {
+      chapters = data.chapters;
+      rawText = chapters.map(c => c.title + '\n\n' + c.body).join('\n\n');
+      if (data.fileName) uploadArea.querySelector('.hint').innerHTML = data.fileName;
+      document.getElementById('settingsPanel').style.display = 'block';
+      document.getElementById('resetBtn').classList.add('visible');
+      renderResult();
+    }
+  } catch (e) { /* ignore */ }
 }
 
 function renderResult() {
@@ -626,8 +652,12 @@ function resetAll() {
   uploadArea.querySelector('.hint').innerHTML = '拖拽文件到此处，或 <strong>点击上传</strong>';
   presetSelect.value = 'auto';
   regexInput.value = '^#{1,6}\\s+.+|^第[一二三四五六七八九十百千\\d]+[章节篇部回]\\s*.*|^Chapter\\s+\\d+|^\\d+[\\.\\、]\\s*.+';
+  localStorage.removeItem('doc-splitter-data');
   showToast('已清空，可以上传新文档');
 }
+
+// Restore on page load
+restoreFromLocal();
 
 // Intersection observer for TOC active state
 const observer = new IntersectionObserver(entries => {

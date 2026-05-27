@@ -430,8 +430,12 @@ async function handleMobi(file) {
     if (mobiMagic === 'MOBI') {
       mobiHeaderLen = view.getUint32(r0 + 20);
       const enc = view.getUint32(r0 + 28);
-      if (enc === 1252) encoding = 'windows-1252';
-      else if (enc === 65001) encoding = 'utf-8';
+      if (enc === 65001) encoding = 'utf-8';
+      else if (enc === 1252) encoding = 'windows-1252';
+      else if (enc === 936 || enc === 54936) encoding = 'gbk';
+      else if (enc === 950) encoding = 'big5';
+      else if (enc === 949) encoding = 'euc-kr';
+      else if (enc === 932) encoding = 'shift_jis';
 
       // Extra record data flags (at MOBI header offset 0xF2 = 242, relative to MOBI start at r0+16)
       if (mobiHeaderLen >= 0xF4) {
@@ -497,8 +501,27 @@ async function handleMobi(file) {
     let pos = 0;
     for (const chunk of textChunks) { merged.set(chunk, pos); pos += chunk.length; }
 
-    const decoder = new TextDecoder(encoding, { fatal: false });
-    const htmlContent = decoder.decode(merged);
+    // Decode with detected encoding, then auto-detect if garbled
+    let htmlContent = new TextDecoder(encoding, { fatal: false }).decode(merged);
+
+    // If too many replacement characters, try other encodings
+    const garbledCount = (htmlContent.match(/�/g) || []).length;
+    if (garbledCount > 10) {
+      const tryEncodings = ['gbk', 'gb18030', 'big5', 'shift_jis', 'euc-kr', 'windows-1252'];
+      for (const tryEnc of tryEncodings) {
+        if (tryEnc === encoding) continue;
+        try {
+          const attempt = new TextDecoder(tryEnc, { fatal: false }).decode(merged);
+          const newGarbled = (attempt.match(/�/g) || []).length;
+          if (newGarbled < garbledCount) {
+            htmlContent = attempt;
+            encoding = tryEnc;
+            break;
+          }
+        } catch(e) {}
+      }
+    }
+
     const fullText = htmlToText(htmlContent);
 
     // Try to split by HTML headings

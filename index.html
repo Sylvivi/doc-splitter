@@ -331,7 +331,8 @@ function splitByPattern(rawText, pattern) {
 
 function reSplitCurrentDoc() {
   const doc = documents.find(d => d.id === activeDocId);
-  if (!doc || !doc.rawText) { showToast('此文档不支持重新拆分'); return; }
+  if (!doc) return;
+  if (!doc.rawText) { doc.rawText = doc.chapters.map(c => c.title + '\n\n' + c.body).join('\n\n'); }
   const pattern = regexInput.value.trim();
   doc.chapters = splitByPattern(doc.rawText, pattern);
   saveToLocal();
@@ -617,7 +618,7 @@ function showActiveDoc() {
 
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('resultArea').style.display = 'block';
-  document.getElementById('settingsPanel').style.display = doc.rawText ? 'block' : 'none';
+  document.getElementById('settingsPanel').style.display = 'block';
   document.getElementById('docBannerTitle').textContent = doc.fileName;
   document.getElementById('docBannerMeta').textContent = `${doc.chapters.length} 章 · ${(doc.fileSize / 1024).toFixed(1)} KB · ${doc.fileType.toUpperCase()}`;
   document.getElementById('chapterStats').textContent = `共 ${doc.chapters.length} 章`;

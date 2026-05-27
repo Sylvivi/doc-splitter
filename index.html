@@ -16,17 +16,29 @@
   .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
 
   /* Upload Area */
-  .upload-area { background: #fff; border: 2px dashed #c8d0e0; border-radius: 12px; padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 24px; }
+  .upload-area { background: #fff; border: 2px dashed #c8d0e0; border-radius: 12px; padding: 36px 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 24px; }
   .upload-area:hover, .upload-area.dragover { border-color: #667eea; background: #f0f2ff; }
-  .upload-area svg { width: 48px; height: 48px; color: #667eea; margin-bottom: 12px; }
+  .upload-area svg { width: 40px; height: 40px; color: #667eea; margin-bottom: 8px; }
   .upload-area .hint { font-size: 15px; color: #666; }
   .upload-area .hint strong { color: #667eea; }
   .upload-area input { display: none; }
-  .upload-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; }
-  .upload-bar .upload-area { flex: 1; margin-bottom: 0; }
-  .btn-reset { background: #fff; border: 1px solid #e0e0e0; color: #999; border-radius: 12px; padding: 16px 24px; font-size: 14px; cursor: pointer; transition: all 0.2s; white-space: nowrap; height: 100%; display: none; align-items: center; gap: 6px; }
-  .btn-reset:hover { border-color: #f56565; color: #f56565; background: #fff5f5; }
-  .btn-reset.visible { display: flex; }
+
+  /* Shelf */
+  .shelf { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .shelf h3 { font-size: 15px; margin-bottom: 14px; color: #555; display: flex; justify-content: space-between; align-items: center; }
+  .shelf-list { display: flex; flex-wrap: wrap; gap: 10px; }
+  .shelf-item { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #f5f7fa; border: 1px solid #e0e4ea; border-radius: 8px; cursor: pointer; transition: all 0.15s; max-width: 280px; }
+  .shelf-item:hover { border-color: #667eea; background: #f0f2ff; }
+  .shelf-item.active { border-color: #667eea; background: #667eea; color: #fff; }
+  .shelf-item.active .shelf-item-meta { color: rgba(255,255,255,0.7); }
+  .shelf-item.active .shelf-delete { color: rgba(255,255,255,0.6); }
+  .shelf-item.active .shelf-delete:hover { color: #fff; }
+  .shelf-item-icon { font-size: 20px; flex-shrink: 0; }
+  .shelf-item-info { flex: 1; min-width: 0; }
+  .shelf-item-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .shelf-item-meta { font-size: 11px; color: #999; margin-top: 2px; }
+  .shelf-delete { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; padding: 2px 4px; border-radius: 4px; flex-shrink: 0; transition: color 0.15s; }
+  .shelf-delete:hover { color: #f56565; }
 
   /* Settings */
   .settings { background: #fff; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
@@ -41,6 +53,8 @@
   .btn-sm { padding: 5px 14px; font-size: 13px; }
   .btn-outline { background: transparent; border: 1px solid #d0d5dd; color: #555; }
   .btn-outline:hover { background: #f5f7fa; }
+  .btn-danger-text { background: none; border: none; color: #999; font-size: 13px; cursor: pointer; }
+  .btn-danger-text:hover { color: #f56565; }
 
   /* Layout */
   .main-layout { display: flex; gap: 24px; align-items: flex-start; }
@@ -78,18 +92,23 @@
   .empty-state { text-align: center; padding: 80px 24px; color: #999; }
   .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; color: #ddd; }
 
-  /* Copy All */
+  /* Toolbar */
   .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-
-  /* Search */
   .search-box { padding: 8px 12px; border: 1px solid #d0d5dd; border-radius: 8px; font-size: 13px; width: 220px; }
   .search-box:focus { outline: none; border-color: #667eea; }
+
+  /* Current doc banner */
+  .doc-banner { background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
+  .doc-banner-title { font-size: 16px; font-weight: 700; color: #333; }
+  .doc-banner-meta { font-size: 12px; color: #999; margin-top: 2px; }
+  .doc-banner-actions { display: flex; gap: 8px; }
 
   @media (max-width: 768px) {
     .main-layout { flex-direction: column; }
     .sidebar { width: 100%; position: static; }
     .toc-list { max-height: 200px; }
     .settings-row input[type="text"] { width: 100%; }
+    .shelf-item { max-width: 100%; }
   }
 </style>
 </head>
@@ -97,25 +116,30 @@
 
 <div class="header">
   <h1>文档章节拆分工具</h1>
-  <p>上传文档 → 自动按章节拆分 → 一键复制</p>
+  <p>上传文档 → 自动按章节拆分 → 一键复制 · 支持多文档书架</p>
 </div>
 
 <div class="container">
-  <div class="upload-bar">
-    <div class="upload-area" id="uploadArea">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-      <div class="hint">拖拽文件到此处，或 <strong>点击上传</strong></div>
-      <div class="hint" style="font-size:12px;margin-top:6px;color:#999">支持 .txt / .md / .epub / .mobi / .csv / .json 等文件</div>
-      <input type="file" id="fileInput" accept=".txt,.md,.csv,.json,.log,.text,.rst,.adoc,.xml,.html,.htm,.yaml,.yml,.toml,.ini,.cfg,.conf,.tex,.bib,.srt,.epub,.mobi,.azw,.azw3">
-    </div>
-    <button class="btn-reset" id="resetBtn" onclick="resetAll()">🗑️ 清空</button>
+  <div class="upload-area" id="uploadArea">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+    <div class="hint">拖拽文件到此处，或 <strong>点击上传</strong></div>
+    <div class="hint" style="font-size:12px;margin-top:6px;color:#999">支持 .txt / .md / .epub / .mobi / .csv / .json 等文件</div>
+    <input type="file" id="fileInput" accept=".txt,.md,.csv,.json,.log,.text,.rst,.adoc,.xml,.html,.htm,.yaml,.yml,.toml,.ini,.cfg,.conf,.tex,.bib,.srt,.epub,.mobi,.azw,.azw3">
+  </div>
+
+  <div class="shelf" id="shelfPanel" style="display:none">
+    <h3>
+      📚 文档书架
+      <button class="btn-danger-text" onclick="clearAllDocs()">清空全部</button>
+    </h3>
+    <div class="shelf-list" id="shelfList"></div>
   </div>
 
   <div class="settings" id="settingsPanel" style="display:none">
     <h3>拆分设置</h3>
     <div class="settings-row">
       <div>
-        <label>章节匹配正则（每行一个，匹配行作为章节标题）</label>
+        <label>章节匹配正则</label>
         <input type="text" id="regexInput" value="^#{1,6}\s+.+|^第[一二三四五六七八九十百千\d]+[章节篇部回]\s*.*|^[Cc]hapter\s*\d+|^\d+[\.\、]\s*.+">
       </div>
       <div>
@@ -129,7 +153,7 @@
           <option value="custom">自定义正则</option>
         </select>
       </div>
-      <button class="btn btn-primary" onclick="splitDocument()">重新拆分</button>
+      <button class="btn btn-primary" onclick="reSplitCurrentDoc()">重新拆分</button>
     </div>
   </div>
 
@@ -142,12 +166,21 @@
         </div>
       </div>
       <div class="content">
+        <div class="doc-banner" id="docBanner">
+          <div>
+            <div class="doc-banner-title" id="docBannerTitle"></div>
+            <div class="doc-banner-meta" id="docBannerMeta"></div>
+          </div>
+          <div class="doc-banner-actions">
+            <button class="btn btn-sm btn-primary" onclick="copyAll()">复制全部</button>
+            <button class="btn btn-sm btn-outline" onclick="deleteCurrentDoc()">🗑️ 删除此文档</button>
+          </div>
+        </div>
         <div class="toolbar">
           <input type="text" class="search-box" placeholder="搜索章节..." id="searchBox" oninput="filterChapters()">
           <div style="display:flex;gap:8px">
             <button class="btn btn-sm btn-outline" onclick="expandAll()">全部展开</button>
             <button class="btn btn-sm btn-outline" onclick="collapseAll()">全部折叠</button>
-            <button class="btn btn-sm btn-primary" onclick="copyAll()">复制全部</button>
           </div>
         </div>
         <div id="chaptersContainer"></div>
@@ -168,8 +201,10 @@ const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('fileInput');
 const regexInput = document.getElementById('regexInput');
 const presetSelect = document.getElementById('presetSelect');
-let rawText = '';
-let chapters = [];
+
+// Core data: array of saved documents
+let documents = []; // { id, fileName, fileSize, fileType, chapters[], rawText }
+let activeDocId = null; // currently viewed doc
 
 const PRESETS = {
   auto: '',
@@ -180,23 +215,29 @@ const PRESETS = {
   custom: ''
 };
 
+const FILE_ICONS = { epub: '📗', mobi: '📕', azw: '📕', azw3: '📕', txt: '📄', md: '📝', json: '📋', default: '📄' };
+function getFileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  return FILE_ICONS[ext] || FILE_ICONS.default;
+}
+
 presetSelect.addEventListener('change', () => {
   const v = presetSelect.value;
   if (v === 'custom') { regexInput.focus(); return; }
-  if (v === 'auto') { regexInput.value = '^#{1,6}\\s+.+|^第[一二三四五六七八九十百千\\d]+[章节篇部回]\\s*.*|^Chapter\\s+\\d+|^\\d+[\\.\\、]\\s*.+'; }
+  if (v === 'auto') { regexInput.value = '^#{1,6}\\s+.+|^第[一二三四五六七八九十百千\\d]+[章节篇部回]\\s*.*|^[Cc]hapter\\s*\\d+|^\\d+[\\.\\、]\\s*.+'; }
   else { regexInput.value = PRESETS[v]; }
-  if (rawText) splitDocument();
 });
 
 uploadArea.addEventListener('click', () => fileInput.click());
 uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
 uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
 uploadArea.addEventListener('drop', e => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); fileInput.value = ''; });
+
+// ========== File Handling ==========
 
 function handleFile(file) {
   if (!file) return;
-  uploadArea.querySelector('.hint').innerHTML = `正在加载: <strong>${file.name}</strong> ...`;
   const fname = file.name.toLowerCase();
   const isEpub = fname.endsWith('.epub');
   const isMobi = fname.endsWith('.mobi') || fname.endsWith('.azw') || fname.endsWith('.azw3');
@@ -208,262 +249,28 @@ function handleFile(file) {
   } else {
     const reader = new FileReader();
     reader.onload = e => {
-      rawText = e.target.result;
-      document.getElementById('settingsPanel').style.display = 'block';
-      document.getElementById('resetBtn').classList.add('visible');
-      uploadArea.querySelector('.hint').innerHTML = `已加载: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
-      autoDetectAndSplit();
+      const rawText = e.target.result;
+      const chapters = autoSplitText(rawText);
+      addDocument(file.name, file.size, 'text', chapters, rawText);
     };
     reader.readAsText(file, 'UTF-8');
   }
 }
 
-async function handleEpub(file) {
-  try {
-    const zip = await JSZip.loadAsync(file);
-
-    // Parse container.xml to find the OPF file
-    const containerXml = await zip.file('META-INF/container.xml')?.async('text');
-    let opfPath = '';
-    if (containerXml) {
-      const m = containerXml.match(/full-path="([^"]+\.opf)"/);
-      if (m) opfPath = m[1];
-    }
-
-    // Find OPF if container.xml didn't work
-    if (!opfPath) {
-      zip.forEach((path) => { if (path.endsWith('.opf')) opfPath = path; });
-    }
-
-    let orderedFiles = [];
-    const opfDir = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/') + 1) : '';
-
-    if (opfPath) {
-      const opfText = await zip.file(opfPath)?.async('text');
-      if (opfText) {
-        // Get manifest id->href map
-        const manifest = {};
-        const itemRe = /<item\s[^>]*id="([^"]*)"[^>]*href="([^"]*)"[^>]*media-type="([^"]*)"[^>]*\/?>/g;
-        const itemRe2 = /<item\s[^>]*href="([^"]*)"[^>]*id="([^"]*)"[^>]*media-type="([^"]*)"[^>]*\/?>/g;
-        let im;
-        while ((im = itemRe.exec(opfText)) !== null) { manifest[im[1]] = { href: im[2], type: im[3] }; }
-        while ((im = itemRe2.exec(opfText)) !== null) { manifest[im[2]] = { href: im[1], type: im[3] }; }
-
-        // Get spine order
-        const spineRe = /<itemref\s[^>]*idref="([^"]*)"/g;
-        let sm;
-        while ((sm = spineRe.exec(opfText)) !== null) {
-          const entry = manifest[sm[1]];
-          if (entry && entry.type.includes('html')) {
-            orderedFiles.push(opfDir + decodeURIComponent(entry.href));
-          }
-        }
-      }
-    }
-
-    // Fallback: just find all xhtml/html files
-    if (orderedFiles.length === 0) {
-      zip.forEach((path) => {
-        if (/\.(xhtml|html|htm)$/i.test(path) && !path.startsWith('META-INF')) {
-          orderedFiles.push(path);
-        }
-      });
-      orderedFiles.sort();
-    }
-
-    // Extract text from each file as a chapter
-    const epubChapters = [];
-    for (const fpath of orderedFiles) {
-      const f = zip.file(fpath);
-      if (!f) continue;
-      const html = await f.async('text');
-      const text = htmlToText(html);
-      if (text.trim().length < 5) continue;
-
-      // Try to extract title from <title> or first <h1>-<h3>
-      let title = '';
-      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-      const hMatch = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
-      if (hMatch) title = hMatch[1].replace(/<[^>]+>/g, '').trim();
-      else if (titleMatch) title = titleMatch[1].trim();
-      if (!title || title.length > 100) {
-        title = text.split('\n').find(l => l.trim().length > 0)?.substring(0, 80) || fpath.split('/').pop();
-      }
-
-      epubChapters.push({ title, body: text.trim() });
-    }
-
-    // Set results directly as chapters (skip regex splitting for epub)
-    rawText = epubChapters.map(c => c.title + '\n\n' + c.body).join('\n\n');
-    chapters = epubChapters;
-    document.getElementById('settingsPanel').style.display = 'block';
-    document.getElementById('resetBtn').classList.add('visible');
-    uploadArea.querySelector('.hint').innerHTML = `已加载: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB · EPUB)`;
-    renderResult();
-    saveToLocal();
-    showToast(`EPUB 解析完成，共 ${chapters.length} 章`);
-
-  } catch (err) {
-    showToast('EPUB 解析失败: ' + err.message);
-    console.error(err);
-  }
+function addDocument(fileName, fileSize, fileType, chapters, rawText) {
+  const doc = {
+    id: Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    fileName, fileSize, fileType, chapters, rawText: rawText || ''
+  };
+  documents.push(doc);
+  activeDocId = doc.id;
+  saveToLocal();
+  renderShelf();
+  showActiveDoc();
+  showToast(`已添加「${fileName}」，共 ${chapters.length} 章`);
 }
 
-function htmlToText(html) {
-  // Remove scripts and styles
-  let text = html.replace(/<script[\s\S]*?<\/script>/gi, '');
-  text = text.replace(/<style[\s\S]*?<\/style>/gi, '');
-  // Convert block elements to newlines
-  text = text.replace(/<\/(p|div|h[1-6]|li|tr|blockquote|br\s*\/?)>/gi, '\n');
-  text = text.replace(/<br\s*\/?>/gi, '\n');
-  // Remove all remaining tags
-  text = text.replace(/<[^>]+>/g, '');
-  // Decode HTML entities
-  const textarea = document.createElement('textarea');
-  textarea.innerHTML = text;
-  text = textarea.value;
-  // Clean up whitespace
-  text = text.replace(/[ \t]+/g, ' ');
-  text = text.replace(/\n{3,}/g, '\n\n');
-  return text.trim();
-}
-
-async function handleMobi(file) {
-  try {
-    const buf = await file.arrayBuffer();
-    const data = new Uint8Array(buf);
-    const view = new DataView(buf);
-
-    // PDB Header: 78 bytes + record list
-    const numRecords = view.getUint16(76);
-    const records = [];
-    for (let i = 0; i < numRecords; i++) {
-      const offset = view.getUint32(78 + i * 8);
-      records.push(offset);
-    }
-    records.push(data.length); // sentinel
-
-    // PalmDOC Header at record 0
-    const r0 = records[0];
-    const compression = view.getUint16(r0);
-    const textLength = view.getUint32(r0 + 4);
-    const textRecordCount = view.getUint16(r0 + 8);
-
-    // MOBI Header
-    const mobiMagic = String.fromCharCode(data[r0+16], data[r0+17], data[r0+18], data[r0+19]);
-    let encoding = 'utf-8';
-    if (mobiMagic === 'MOBI') {
-      const enc = view.getUint32(r0 + 44);
-      if (enc === 1252) encoding = 'windows-1252';
-    }
-
-    // Decompress text records
-    const textChunks = [];
-    for (let i = 1; i <= textRecordCount && i < records.length - 1; i++) {
-      const recData = data.slice(records[i], records[i + 1]);
-      let decoded;
-      if (compression === 1) {
-        decoded = recData; // no compression
-      } else if (compression === 2) {
-        decoded = palmDocDecompress(recData); // PalmDOC LZ77
-      } else {
-        decoded = recData; // fallback
-      }
-      textChunks.push(decoded);
-    }
-
-    // Merge and decode
-    const totalLen = textChunks.reduce((s, c) => s + c.length, 0);
-    const merged = new Uint8Array(totalLen);
-    let pos = 0;
-    for (const chunk of textChunks) {
-      merged.set(chunk, pos);
-      pos += chunk.length;
-    }
-    const decoder = new TextDecoder(encoding);
-    const htmlContent = decoder.decode(merged);
-    const fullText = htmlToText(htmlContent);
-
-    // Split by chapter markers in the HTML (h1/h2/h3, or page breaks)
-    const chapterSplitRe = /<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/gi;
-    const parts = htmlContent.split(/<h[1-3][^>]*>[\s\S]*?<\/h[1-3]>/i);
-    const titles = [];
-    let m;
-    while ((m = chapterSplitRe.exec(htmlContent)) !== null) {
-      titles.push(m[1].replace(/<[^>]+>/g, '').trim());
-    }
-
-    const mobiChapters = [];
-    if (titles.length >= 2) {
-      // First part before any heading
-      const preface = htmlToText(parts[0]).trim();
-      if (preface.length > 20) {
-        mobiChapters.push({ title: '前言', body: preface });
-      }
-      for (let i = 0; i < titles.length; i++) {
-        const body = htmlToText(parts[i + 1] || '').trim();
-        if (body.length > 0) {
-          mobiChapters.push({ title: titles[i] || `章节 ${i + 1}`, body });
-        }
-      }
-    }
-
-    if (mobiChapters.length < 2) {
-      // Fallback: treat as plain text and use regex splitting
-      rawText = fullText;
-      document.getElementById('settingsPanel').style.display = 'block';
-      document.getElementById('resetBtn').classList.add('visible');
-      uploadArea.querySelector('.hint').innerHTML = `已加载: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB · MOBI)`;
-      autoDetectAndSplit();
-      return;
-    }
-
-    rawText = mobiChapters.map(c => c.title + '\n\n' + c.body).join('\n\n');
-    chapters = mobiChapters;
-    document.getElementById('settingsPanel').style.display = 'block';
-    document.getElementById('resetBtn').classList.add('visible');
-    uploadArea.querySelector('.hint').innerHTML = `已加载: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB · MOBI)`;
-    renderResult();
-    saveToLocal();
-    showToast(`MOBI 解析完成，共 ${chapters.length} 章`);
-
-  } catch (err) {
-    showToast('MOBI 解析失败: ' + err.message);
-    console.error(err);
-  }
-}
-
-function palmDocDecompress(input) {
-  const output = [];
-  let i = 0;
-  while (i < input.length) {
-    const byte = input[i++];
-    if (byte === 0) {
-      output.push(0);
-    } else if (byte >= 1 && byte <= 8) {
-      for (let j = 0; j < byte && i < input.length; j++) {
-        output.push(input[i++]);
-      }
-    } else if (byte >= 0x80) {
-      if (i >= input.length) break;
-      const next = input[i++];
-      const dist = ((byte << 8) | next) >> 3 & 0x7FF;
-      const len = (next & 0x07) + 3;
-      for (let j = 0; j < len; j++) {
-        output.push(output[output.length - dist]);
-      }
-    } else if (byte >= 0x09 && byte <= 0x7F) {
-      output.push(byte);
-    } else if (byte === 0x01) {
-      // already handled above
-    }
-    // Handle space + char (0xC0 range)
-    if (byte >= 0x01 && byte <= 0x08) continue;
-  }
-  return new Uint8Array(output);
-}
-
-function autoDetectAndSplit() {
+function autoSplitText(rawText) {
   const lines = rawText.split('\n');
   const patterns = [
     { name: 'markdown', re: /^#{1,6}\s+.+/ },
@@ -475,23 +282,23 @@ function autoDetectAndSplit() {
     const count = lines.filter(l => p.re.test(l.trim())).length;
     if (count > bestCount) { bestCount = count; best = p.name; }
   }
+
+  let pattern;
   if (bestCount >= 2 && best) {
-    presetSelect.value = best;
-    regexInput.value = PRESETS[best];
-  } else if (bestCount < 2) {
+    pattern = PRESETS[best];
+  } else {
     const emptyLineBlocks = rawText.split(/\n\s*\n/).filter(b => b.trim().length > 0);
     if (emptyLineBlocks.length >= 2 && emptyLineBlocks.length <= 200) {
-      presetSelect.value = 'empty-line';
-      regexInput.value = PRESETS['empty-line'];
+      pattern = '__EMPTY_LINE__';
+    } else {
+      pattern = '^#{1,6}\\s+.+|^第[一二三四五六七八九十百千\\d]+[章节篇部回]\\s*.*|^[Cc]hapter\\s*\\d+|^\\d+[\\.\\、]\\s*.+';
     }
   }
-  splitDocument();
+  return splitByPattern(rawText, pattern);
 }
 
-function splitDocument() {
-  const pattern = regexInput.value.trim();
-  chapters = [];
-
+function splitByPattern(rawText, pattern) {
+  const chapters = [];
   if (pattern === '__EMPTY_LINE__') {
     const blocks = rawText.split(/\n\s*\n/).filter(b => b.trim().length > 0);
     blocks.forEach((block, i) => {
@@ -501,12 +308,11 @@ function splitDocument() {
     });
   } else {
     let regex;
-    try { regex = new RegExp(pattern, 'm'); } catch (e) { showToast('正则表达式无效: ' + e.message); return; }
+    try { regex = new RegExp(pattern); } catch (e) { return [{ title: '全文', body: rawText }]; }
     const lines = rawText.split('\n');
     let currentTitle = null, currentLines = [];
-    const globalRe = new RegExp(pattern);
     for (const line of lines) {
-      if (globalRe.test(line.trim())) {
+      if (regex.test(line.trim())) {
         if (currentTitle !== null || currentLines.length > 0) {
           chapters.push({ title: currentTitle || '前言 / 引言', body: currentLines.join('\n').trim() });
         }
@@ -520,47 +326,247 @@ function splitDocument() {
       chapters.push({ title: currentTitle || '前言 / 引言', body: currentLines.join('\n').trim() });
     }
   }
+  return chapters.filter(c => c.body.length > 0);
+}
 
-  chapters = chapters.filter(c => c.body.length > 0);
-  renderResult();
+function reSplitCurrentDoc() {
+  const doc = documents.find(d => d.id === activeDocId);
+  if (!doc || !doc.rawText) { showToast('此文档不支持重新拆分'); return; }
+  const pattern = regexInput.value.trim();
+  doc.chapters = splitByPattern(doc.rawText, pattern);
   saveToLocal();
+  showActiveDoc();
+  showToast(`重新拆分完成，共 ${doc.chapters.length} 章`);
 }
 
-function saveToLocal() {
-  try {
-    const data = { chapters, fileName: uploadArea.querySelector('.hint')?.innerHTML || '' };
-    localStorage.setItem('doc-splitter-data', JSON.stringify(data));
-  } catch (e) { /* ignore quota errors */ }
-}
+// ========== EPUB ==========
 
-function restoreFromLocal() {
+async function handleEpub(file) {
   try {
-    const saved = localStorage.getItem('doc-splitter-data');
-    if (!saved) return;
-    const data = JSON.parse(saved);
-    if (data.chapters && data.chapters.length > 0) {
-      chapters = data.chapters;
-      rawText = chapters.map(c => c.title + '\n\n' + c.body).join('\n\n');
-      if (data.fileName) uploadArea.querySelector('.hint').innerHTML = data.fileName;
-      document.getElementById('settingsPanel').style.display = 'block';
-      document.getElementById('resetBtn').classList.add('visible');
-      renderResult();
+    const zip = await JSZip.loadAsync(file);
+    const containerXml = await zip.file('META-INF/container.xml')?.async('text');
+    let opfPath = '';
+    if (containerXml) {
+      const m = containerXml.match(/full-path="([^"]+\.opf)"/);
+      if (m) opfPath = m[1];
     }
-  } catch (e) { /* ignore */ }
+    if (!opfPath) { zip.forEach((path) => { if (path.endsWith('.opf')) opfPath = path; }); }
+
+    let orderedFiles = [];
+    const opfDir = opfPath.includes('/') ? opfPath.substring(0, opfPath.lastIndexOf('/') + 1) : '';
+
+    if (opfPath) {
+      const opfText = await zip.file(opfPath)?.async('text');
+      if (opfText) {
+        const manifest = {};
+        const itemRe = /<item\s[^>]*id="([^"]*)"[^>]*href="([^"]*)"[^>]*media-type="([^"]*)"[^>]*\/?>/g;
+        const itemRe2 = /<item\s[^>]*href="([^"]*)"[^>]*id="([^"]*)"[^>]*media-type="([^"]*)"[^>]*\/?>/g;
+        let im;
+        while ((im = itemRe.exec(opfText)) !== null) { manifest[im[1]] = { href: im[2], type: im[3] }; }
+        while ((im = itemRe2.exec(opfText)) !== null) { manifest[im[2]] = { href: im[1], type: im[3] }; }
+        const spineRe = /<itemref\s[^>]*idref="([^"]*)"/g;
+        let sm;
+        while ((sm = spineRe.exec(opfText)) !== null) {
+          const entry = manifest[sm[1]];
+          if (entry && entry.type.includes('html')) { orderedFiles.push(opfDir + decodeURIComponent(entry.href)); }
+        }
+      }
+    }
+    if (orderedFiles.length === 0) {
+      zip.forEach((path) => { if (/\.(xhtml|html|htm)$/i.test(path) && !path.startsWith('META-INF')) orderedFiles.push(path); });
+      orderedFiles.sort();
+    }
+
+    const chapters = [];
+    for (const fpath of orderedFiles) {
+      const f = zip.file(fpath);
+      if (!f) continue;
+      const html = await f.async('text');
+      const text = htmlToText(html);
+      if (text.trim().length < 5) continue;
+      let title = '';
+      const hMatch = html.match(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/i);
+      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      if (hMatch) title = hMatch[1].replace(/<[^>]+>/g, '').trim();
+      else if (titleMatch) title = titleMatch[1].trim();
+      if (!title || title.length > 100) { title = text.split('\n').find(l => l.trim().length > 0)?.substring(0, 80) || fpath.split('/').pop(); }
+      chapters.push({ title, body: text.trim() });
+    }
+    addDocument(file.name, file.size, 'epub', chapters, '');
+  } catch (err) {
+    showToast('EPUB 解析失败: ' + err.message);
+    console.error(err);
+  }
 }
 
-function renderResult() {
+// ========== MOBI ==========
+
+async function handleMobi(file) {
+  try {
+    const buf = await file.arrayBuffer();
+    const data = new Uint8Array(buf);
+    const view = new DataView(buf);
+    const numRecords = view.getUint16(76);
+    const records = [];
+    for (let i = 0; i < numRecords; i++) { records.push(view.getUint32(78 + i * 8)); }
+    records.push(data.length);
+
+    const r0 = records[0];
+    const compression = view.getUint16(r0);
+    const textRecordCount = view.getUint16(r0 + 8);
+    const mobiMagic = String.fromCharCode(data[r0+16], data[r0+17], data[r0+18], data[r0+19]);
+    let encoding = 'utf-8';
+    if (mobiMagic === 'MOBI') { const enc = view.getUint32(r0 + 44); if (enc === 1252) encoding = 'windows-1252'; }
+
+    const textChunks = [];
+    for (let i = 1; i <= textRecordCount && i < records.length - 1; i++) {
+      const recData = data.slice(records[i], records[i + 1]);
+      textChunks.push(compression === 2 ? palmDocDecompress(recData) : recData);
+    }
+    const totalLen = textChunks.reduce((s, c) => s + c.length, 0);
+    const merged = new Uint8Array(totalLen);
+    let pos = 0;
+    for (const chunk of textChunks) { merged.set(chunk, pos); pos += chunk.length; }
+    const htmlContent = new TextDecoder(encoding).decode(merged);
+    const fullText = htmlToText(htmlContent);
+
+    const chapterSplitRe = /<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/gi;
+    const parts = htmlContent.split(/<h[1-3][^>]*>[\s\S]*?<\/h[1-3]>/i);
+    const titles = [];
+    let m;
+    while ((m = chapterSplitRe.exec(htmlContent)) !== null) { titles.push(m[1].replace(/<[^>]+>/g, '').trim()); }
+
+    const chapters = [];
+    if (titles.length >= 2) {
+      const preface = htmlToText(parts[0]).trim();
+      if (preface.length > 20) chapters.push({ title: '前言', body: preface });
+      for (let i = 0; i < titles.length; i++) {
+        const body = htmlToText(parts[i + 1] || '').trim();
+        if (body.length > 0) chapters.push({ title: titles[i] || `章节 ${i + 1}`, body });
+      }
+    }
+
+    if (chapters.length < 2) {
+      addDocument(file.name, file.size, 'mobi', autoSplitText(fullText), fullText);
+    } else {
+      addDocument(file.name, file.size, 'mobi', chapters, '');
+    }
+  } catch (err) {
+    showToast('MOBI 解析失败: ' + err.message);
+    console.error(err);
+  }
+}
+
+function palmDocDecompress(input) {
+  const output = [];
+  let i = 0;
+  while (i < input.length) {
+    const byte = input[i++];
+    if (byte === 0) { output.push(0); }
+    else if (byte >= 1 && byte <= 8) { for (let j = 0; j < byte && i < input.length; j++) output.push(input[i++]); }
+    else if (byte >= 0x80) {
+      if (i >= input.length) break;
+      const next = input[i++];
+      const dist = ((byte << 8) | next) >> 3 & 0x7FF;
+      const len = (next & 0x07) + 3;
+      for (let j = 0; j < len; j++) output.push(output[output.length - dist]);
+    }
+    else if (byte >= 0x09 && byte <= 0x7F) { output.push(byte); }
+  }
+  return new Uint8Array(output);
+}
+
+function htmlToText(html) {
+  let text = html.replace(/<script[\s\S]*?<\/script>/gi, '');
+  text = text.replace(/<style[\s\S]*?<\/style>/gi, '');
+  text = text.replace(/<\/(p|div|h[1-6]|li|tr|blockquote|br\s*\/?)>/gi, '\n');
+  text = text.replace(/<br\s*\/?>/gi, '\n');
+  text = text.replace(/<[^>]+>/g, '');
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  text = textarea.value;
+  text = text.replace(/[ \t]+/g, ' ');
+  text = text.replace(/\n{3,}/g, '\n\n');
+  return text.trim();
+}
+
+// ========== Shelf & Navigation ==========
+
+function renderShelf() {
+  const panel = document.getElementById('shelfPanel');
+  if (documents.length === 0) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  const list = document.getElementById('shelfList');
+  list.innerHTML = documents.map(doc => `
+    <div class="shelf-item ${doc.id === activeDocId ? 'active' : ''}" onclick="openDocument('${doc.id}')">
+      <span class="shelf-item-icon">${getFileIcon(doc.fileName)}</span>
+      <div class="shelf-item-info">
+        <div class="shelf-item-name" title="${esc(doc.fileName)}">${esc(doc.fileName)}</div>
+        <div class="shelf-item-meta">${doc.chapters.length} 章 · ${(doc.fileSize / 1024).toFixed(0)} KB</div>
+      </div>
+      <button class="shelf-delete" onclick="event.stopPropagation(); deleteDocument('${doc.id}')" title="删除">✕</button>
+    </div>
+  `).join('');
+}
+
+function openDocument(id) {
+  activeDocId = id;
+  renderShelf();
+  showActiveDoc();
+}
+
+function showActiveDoc() {
+  const doc = documents.find(d => d.id === activeDocId);
+  if (!doc) {
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('settingsPanel').style.display = 'none';
+    document.getElementById('emptyState').style.display = documents.length === 0 ? '' : 'none';
+    return;
+  }
+
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('resultArea').style.display = 'block';
-  document.getElementById('chapterStats').textContent = `共 ${chapters.length} 章`;
+  document.getElementById('settingsPanel').style.display = doc.rawText ? 'block' : 'none';
+  document.getElementById('docBannerTitle').textContent = doc.fileName;
+  document.getElementById('docBannerMeta').textContent = `${doc.chapters.length} 章 · ${(doc.fileSize / 1024).toFixed(1)} KB · ${doc.fileType.toUpperCase()}`;
+  document.getElementById('chapterStats').textContent = `共 ${doc.chapters.length} 章`;
 
   const tocList = document.getElementById('tocList');
-  tocList.innerHTML = chapters.map((ch, i) =>
+  tocList.innerHTML = doc.chapters.map((ch, i) =>
     `<li><a href="#ch-${i}" onclick="scrollToChapter(${i})" id="toc-${i}" title="${esc(ch.title)}">${esc(ch.title)}</a></li>`
   ).join('');
 
-  renderChapters(chapters);
+  renderChapters(doc.chapters);
 }
+
+function deleteDocument(id) {
+  const doc = documents.find(d => d.id === id);
+  documents = documents.filter(d => d.id !== id);
+  if (activeDocId === id) {
+    activeDocId = documents.length > 0 ? documents[documents.length - 1].id : null;
+  }
+  saveToLocal();
+  renderShelf();
+  showActiveDoc();
+  if (doc) showToast(`已删除「${doc.fileName}」`);
+}
+
+function deleteCurrentDoc() {
+  if (activeDocId) deleteDocument(activeDocId);
+}
+
+function clearAllDocs() {
+  documents = [];
+  activeDocId = null;
+  localStorage.removeItem('doc-splitter-data');
+  renderShelf();
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('settingsPanel').style.display = 'none';
+  document.getElementById('emptyState').style.display = '';
+  showToast('已清空全部文档');
+}
+
+// ========== Render ==========
 
 function renderChapters(list) {
   const container = document.getElementById('chaptersContainer');
@@ -590,18 +596,25 @@ function esc(s) {
   return d.innerHTML;
 }
 
+// ========== Actions ==========
+
 function copyChapter(i, btn) {
-  const text = chapters[i].title + '\n\n' + chapters[i].body;
+  const doc = documents.find(d => d.id === activeDocId);
+  if (!doc) return;
+  const ch = doc.chapters[i];
+  const text = ch.title + '\n\n' + ch.body;
   navigator.clipboard.writeText(text).then(() => {
     btn.classList.add('copied');
     btn.textContent = '✓ 已复制';
-    showToast(`已复制「${chapters[i].title}」`);
+    showToast(`已复制「${ch.title}」`);
     setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋 复制'; }, 2000);
   });
 }
 
 function copyAll() {
-  const text = chapters.map(ch => ch.title + '\n\n' + ch.body).join('\n\n---\n\n');
+  const doc = documents.find(d => d.id === activeDocId);
+  if (!doc) return;
+  const text = doc.chapters.map(ch => ch.title + '\n\n' + ch.body).join('\n\n---\n\n');
   navigator.clipboard.writeText(text).then(() => showToast('已复制全部章节'));
 }
 
@@ -616,19 +629,25 @@ function collapseAll() { document.querySelectorAll('.chapter-body').forEach(b =>
 
 function scrollToChapter(i) {
   document.querySelectorAll('.toc-list a').forEach(a => a.classList.remove('active'));
-  document.getElementById(`toc-${i}`).classList.add('active');
-  document.getElementById(`ch-${i}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById(`toc-${i}`)?.classList.add('active');
+  document.getElementById(`ch-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function filterChapters() {
+  const doc = documents.find(d => d.id === activeDocId);
+  if (!doc) return;
   const q = document.getElementById('searchBox').value.toLowerCase();
   document.querySelectorAll('.chapter-card').forEach(card => {
     const i = parseInt(card.dataset.index);
-    const match = !q || chapters[i].title.toLowerCase().includes(q) || chapters[i].body.toLowerCase().includes(q);
+    const ch = doc.chapters[i];
+    if (!ch) return;
+    const match = !q || ch.title.toLowerCase().includes(q) || ch.body.toLowerCase().includes(q);
     card.style.display = match ? '' : 'none';
   });
   document.querySelectorAll('.toc-list li').forEach((li, i) => {
-    const match = !q || chapters[i].title.toLowerCase().includes(q) || chapters[i].body.toLowerCase().includes(q);
+    const ch = doc.chapters[i];
+    if (!ch) return;
+    const match = !q || ch.title.toLowerCase().includes(q) || ch.body.toLowerCase().includes(q);
     li.style.display = match ? '' : 'none';
   });
 }
@@ -640,36 +659,41 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-function resetAll() {
-  rawText = '';
-  chapters = [];
-  fileInput.value = '';
-  document.getElementById('settingsPanel').style.display = 'none';
-  document.getElementById('resultArea').style.display = 'none';
-  document.getElementById('emptyState').style.display = '';
-  document.getElementById('searchBox').value = '';
-  document.getElementById('resetBtn').classList.remove('visible');
-  uploadArea.querySelector('.hint').innerHTML = '拖拽文件到此处，或 <strong>点击上传</strong>';
-  presetSelect.value = 'auto';
-  regexInput.value = '^#{1,6}\\s+.+|^第[一二三四五六七八九十百千\\d]+[章节篇部回]\\s*.*|^Chapter\\s+\\d+|^\\d+[\\.\\、]\\s*.+';
-  localStorage.removeItem('doc-splitter-data');
-  showToast('已清空，可以上传新文档');
+// ========== Persistence ==========
+
+function saveToLocal() {
+  try {
+    // Don't save rawText for large docs to avoid quota issues
+    const toSave = documents.map(d => ({
+      ...d,
+      rawText: d.rawText && d.rawText.length < 500000 ? d.rawText : ''
+    }));
+    localStorage.setItem('doc-splitter-data', JSON.stringify({ documents: toSave, activeDocId }));
+  } catch (e) {
+    // If quota exceeded, try saving without rawText
+    try {
+      const minimal = documents.map(d => ({ ...d, rawText: '' }));
+      localStorage.setItem('doc-splitter-data', JSON.stringify({ documents: minimal, activeDocId }));
+    } catch (e2) { /* give up */ }
+  }
 }
 
-// Restore on page load
-restoreFromLocal();
-
-// Intersection observer for TOC active state
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const i = e.target.dataset.index;
-      document.querySelectorAll('.toc-list a').forEach(a => a.classList.remove('active'));
-      const tocItem = document.getElementById(`toc-${i}`);
-      if (tocItem) tocItem.classList.add('active');
+function restoreFromLocal() {
+  try {
+    const saved = localStorage.getItem('doc-splitter-data');
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    if (data.documents && data.documents.length > 0) {
+      documents = data.documents;
+      activeDocId = data.activeDocId || documents[0].id;
+      renderShelf();
+      showActiveDoc();
     }
-  });
-}, { threshold: 0.3 });
+  } catch (e) { /* ignore */ }
+}
+
+// ========== Init ==========
+restoreFromLocal();
 </script>
 </body>
 </html>
